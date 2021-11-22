@@ -1,4 +1,4 @@
-python==3.9.2
+python-3.9.2
 ansicon==1.89.0
 asgiref==3.4.1
 blessed==1.19.0
@@ -41,3 +41,4 @@ sqlparse==0.4.2
 urllib3==1.26.7
 wcwidth==0.2.5
 whitenoise==5.3.0
+heroku buildpacks:set heroku/python
