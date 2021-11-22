@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background-color: rgb(232, 236, 236);
+            font-family: "한컴 말랑말랑";   
+        }
+        a:link { color: rgb(49, 46, 40); text-decoration: none;}
+        a:visited { color: rgb(49, 46, 40); text-decoration: none;}
+        a:hover { color: rgb(126, 121, 121); text-decoration: none;}
+      </style>
+</head>
+<body>
+    <div class="title" style=" text-align: center;"><img style="height: 200px;"src="../static/아이콘-removebg-preview.png"></div>
+    <div style="display: flex; flex-direction: row; justify-content: space-evenly;">
+        <div><a href="{% url 'showmap' %}">한눈에 보기</a></div>
+        <div class="choice"><a href="{% url 'family' %}">가족과 함께</a></div>
+        <div class="choice"><a href="{% url 'friends' %}">친구와 함께</a></div>
+        <div class="choice"><a href="{% url 'senior' %}">선/후배와 함께</a></div>
+        <div class="choice"><a href="{% url 'lovers' %}">애인과 함께</a></div> 
+        <div class="choice"><a href="{% url 'self' %}">혼밥</a></div>
+   </div>
+    <br>
+
+    <div class="res" style="font-size: 20px; margin-left: 20px; margin-right:20px; position: relative; display: flex; justify-content: center;
+    flex-wrap: wrap; line-height: 150%;">
+    {% for restaurants in restaurants.all %}&emsp;
+    <a href="{% url 'detail' restaurants.id %}" style="display: flex; flex-direction: column;">{{restaurants.name}}<br>
+    {{restaurants.signature_menu}}
+    {% if restaurants.image %}
+    <img src="{{ restaurants.image.url }}" width="100">
+    {% endif %}<br></a>
+    {% endfor %}
+    </div><br>
+
+<!--<footer style="background-color: rgb(219, 219, 219); position: absolute; bottom: 0; left: 0; right: 0;">
+    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+    <img src="../static/아이콘-removebg-preview.png" style="width: 150px; height: 150px;" ><br>
+    <div style="display: flex; flex-direction: column; justify-content: flex-end;">
+    <div style="line-height: 150%; text-align: right;"><p>지인이 학교를 방문했을 때,<br>
+    선/후배와 돈독한 시간을 보내고 싶을 때,<br>
+    애인과 오붓한 시간을 보내고 싶을 때,<br>
+    혼밥하고 싶을 때<br>
+    벗들의 고민을 대신해주는 맛집 가이드 웹사이트<br></p>
+    <p style="color: #838383;">ⓒ 2021. 우리 뭐 먹을까? all rights reserved.</p> </div>
+    </div>
+    </div>
+</footer>-->
+</body>
+</html>

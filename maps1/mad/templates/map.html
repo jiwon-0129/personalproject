@@ -1,0 +1,159 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>이미지 지도에 마커 표시하기</title>
+    <style>
+      body{
+          background-color: rgb(232, 236, 236);
+          font-family: "한컴 말랑말랑";   
+      }
+      a:link { color: rgb(49, 46, 40); text-decoration: none;}
+      a:visited { color: rgb(49, 46, 40); text-decoration: none;}
+      a:hover { color: rgb(126, 121, 121); text-decoration: none;}
+    </style>
+</head>
+<body>
+<div class="title" style=" text-align: center;"><img style="height: 200px;"src="../static/아이콘-removebg-preview.png"></div>
+<div class="upper-bar" style="display: flex; flex-direction: row-reverse; align-items: center;">
+        <div class="icon" style="display: flex; justify-content: flex-end;"> 
+        <div class="register">
+        {%if not user.is_authenticated%}
+        <a href="{% url 'register' %}"><img src="../static/person-add_icon-icons.com_50077.png" style="height: 50px; margin-right: 10px;"></a>
+        {%endif%}     
+        </div>   
+        <div class="login">
+        {% if not user.is_authenticated %}
+        <a href="{% url 'login' %}"><img src="../static/login-square-arrow-button-outline_icon-icons.com_73220.png" style="height: 50px;"></a>
+        {%endif%}
+        </div>
+        <div class="logout">
+        {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}"><img src="../static/logout.png" style="height: 50px; margin-right: 10px;"></a>
+        {% endif %}
+        </div>
+        <div>
+        {% if user.is_authenticated %}
+        <a href="{% url 'new' %}"><img src="../static/plus-round_icon-icons.com_50065.png" style="height: 50px;"></a>
+        {% endif %}
+        </div>
+    </div>
+</div>
+<div id="lat" style="display: none">
+    {%for restaurants in restaurants.all%}
+        {{restaurants.latitude}},
+    {%endfor%}
+</div>
+<div id="lng" style="display: none">
+    {%for restaurants in restaurants.all%}
+        {{restaurants.longitude}},
+    {%endfor%}
+</div>
+<div id="name" style="display: none">
+    {%for restaurants in restaurants.all%}
+        {{restaurants.name}},
+    {%endfor%}
+</div>
+<div id="food_type" style="display: none">
+    {%for restaurants in restaurants.all%}
+        {{restaurants.choice}},
+    {%endfor%}
+</div>
+<div class="map-res_container" style="display: flex; flex-direction: column; font-weight: bold;">
+    <div style="display: flex; flex-direction: row; justify-content: space-evenly;">
+        <div><a href="{% url 'showmap' %}">한눈에 보기</a></div>
+        <div class="choice"><a href="{% url 'family' %}">가족과 함께</a></div>
+        <div class="choice"><a href="{% url 'friends' %}">친구와 함께</a></div>
+        <div class="choice"><a href="{% url 'senior' %}">선/후배와 함께</a></div>
+        <div class="choice"><a href="{% url 'lovers' %}">애인과 함께</a></div> 
+        <div class="choice"><a href="{% url 'self' %}">혼밥</a></div>
+    </div>
+    <br>
+    <div id="map" style="margin-right: auto; margin-left: auto; width:600px; height:350px; "></div>
+    <form method="POST" style="display: flex; flex-direction: row; justify-content: space-evenly;">
+        {% csrf_token %} 
+        <p><label for="id_family">Family</label>
+            <input type="checkbox" name="family" id="id_family"></p>
+        <p><label for="id_lovers">Lovers</label>
+            <input type="checkbox" name="lovers" id="id_lovers"></p>
+        <p><label for="id_senior">senior</label>
+            <input type="checkbox" name="senior" id="id_senior"></p>
+        <p><label for="id_self">self</label>
+            <input type="checkbox" name="self" id="id_self"></p>
+        <p><label for="id_friends">friends</label>
+            <input type="checkbox" name="friends" id="id_friends"></p>
+        <button type="submit">search</button>
+    </form>
+    <br>
+    <div class="res" style="font-size: 20px; margin-left: auto; margin-right: auto; font-weight: normal;">
+        {% for restaurants in restaurants.all %}
+        <a href="{% url 'detail' restaurants.id %}">{{restaurants.name}}</a>&emsp;
+        {% endfor %}
+    </div><br>
+</div>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=	9394b1685a74709649493023fbe8fe7d&libraries=services,clusterer,drawing"></script>
+<script>
+    var list_lat=document.getElementById("lat").innerText.split(',');
+    var list_lng=document.getElementById("lng").innerText.split(',');
+    var list_name=document.getElementById("name").innerText.split(',');
+    var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+        mapOption = { 
+            center: new kakao.maps.LatLng(37.55944, 126.94560), // 지도의 중심좌표
+            level: 3 // 지도의 확대 레벨
+        };
+    
+    var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+    var positions= new Array();
+    var markerPosition  = new kakao.maps.LatLng(37.55944, 126.94560); 
+
+    for(var i =0; i <list_lat.length;i++){
+            positions.push(new kakao.maps.LatLng(list_lat[i],list_lng[i]));
+        }
+    for (var i = 0; i < positions.length; i ++){
+        var marker = new kakao.maps.Marker({
+        map: map, 
+        position: positions[i]});
+        var infowindow = new kakao.maps.InfoWindow({
+        content: '<div class="custom">'+list_name[i] +'</div>' //여기에  표시할 정보 
+    });
+    kakao.maps.event.addListener(marker, 'mouseover', makeOverListener(map, marker, infowindow));
+    kakao.maps.event.addListener(marker, 'mouseout', makeOutListener(infowindow));
+}
+
+function makeOverListener(map, marker, infowindow) {
+    return function() {
+        infowindow.open(map, marker);
+    };
+}
+
+function makeOutListener(infowindow) {
+    return function() {
+        infowindow.close();
+    };
+}
+
+    marker.setMap(map);
+</script>   
+<div>
+<!--{%for showmap in restaurants.all %}
+<img src="{{ showmap.image.url }}" height="100">
+{% endfor %}-->
+<footer style="background-color: rgb(219, 219, 219)" >
+    <div style="display: flex; flex-direction: row; justify-content: space-between; align-items: center;">
+        <img src="../static/아이콘-removebg-preview.png" style="width: 150px; height: 150px;" ><br>
+        <div style="display: flex; flex-direction: column; justify-content: flex-end;">
+        <!--<div class="footer-copyright py-3">Designed and built with all the love in the world<br> by the MOLD team with the help of our contributors.</div>-->
+        <div style="line-height: 150%; text-align: right;"><p>지인이 학교를 방문했을 때,<br>
+        선/후배와 돈독한 시간을 보내고 싶을 때,<br>
+        애인과 오붓한 시간을 보내고 싶을 때,<br>
+        혼밥하고 싶을 때<br>
+        벗들의 고민을 대신해주는 맛집 가이드 웹사이트<br></p>
+        <p style="color: #838383;">ⓒ 2021. 우리 뭐 먹을까? all rights reserved.</p> </div>
+        </div>
+    </div>
+</footer>
+</body>
+</html>
+

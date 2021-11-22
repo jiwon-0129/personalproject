@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background-color: rgb(232, 236, 236);
+            font-family: "한컴 말랑말랑";   
+        }
+        a:link { color: rgb(49, 46, 40); text-decoration: none;}
+        a:visited { color: rgb(49, 46, 40); text-decoration: none;}
+        a:hover { color: rgb(126, 121, 121); text-decoration: none;}
+      </style>
+</head>
+<body>
+    <div class="title" style=" text-align: center;"><img style="height: 200px;"src="../static/아이콘-removebg-preview.png"></div>
+    <div style="display: flex; flex-direction: row; justify-content: space-evenly;">
+        <div><a href="{% url 'showmap' %}">한눈에 보기</a></div>
+        <div class="choice"><a href="{% url 'family' %}">가족과 함께</a></div>
+        <div class="choice"><a href="{% url 'friends' %}">친구와 함께</a></div>
+        <div class="choice"><a href="{% url 'senior' %}">선/후배와 함께</a></div>
+        <div class="choice"><a href="{% url 'lovers' %}">애인과 함께</a></div> 
+        <div class="choice"><a href="{% url 'self' %}">혼밥</a></div>
+   </div>
+
+   <br>
+   <div class="res" style="font-size: 20px; margin-left: 20px; margin-right:20px; position: relative; display: flex; justify-content: center;
+   flex-wrap: wrap; line-height: 150%;">
+   {% for restaurants in restaurants.all %}&emsp;
+   <a href="{% url 'detail' restaurants.id %}" style="display: flex; flex-direction: column;">{{restaurants.name}}<br>
+   {{restaurants.signature_menu}}
+   {% if restaurants.image %}
+   <img src="{{ restaurants.image.url }}" width="100">
+   {% endif %}<br></a>
+   {% endfor %}
+   </div><br>
+
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>마커 생성하기</title>
+    <style>
+        body{
+            background-color: rgb(232, 236, 236);
+            font-family: "한컴 말랑말랑";   
+        }
+        a:link { color: rgb(49, 46, 40); text-decoration: none;}
+        a:visited { color: rgb(49, 46, 40); text-decoration: none;}
+        a:hover { color: rgb(126, 121, 121); text-decoration: none;}
+    
+      </style>
+</head>
+<body>
+<div class="title" style=" text-align: center;"><img src="../static/아이콘-removebg-preview.png" style="height: 200px;"></div>
+    <div style="display: flex; flex-direction: row; justify-content: space-evenly;">
+        <div><a href="{% url 'showmap' %}">한눈에 보기</a></div>
+        <div class="choice"><a href="{% url 'family' %}">가족과 함께</a></div>
+        <div class="choice"><a href="{% url 'friends' %}">친구와 함께</a></div>
+        <div class="choice"><a href="{% url 'senior' %}">선/후배와 함께</a></div>
+        <div class="choice"><a href="{% url 'lovers' %}">애인과 함께</a></div> 
+        <div class="choice"><a href="{% url 'self' %}">혼밥</a></div>
+   </div>
+   <br><br>
+   <div style="line-height: 150%; background-color:rgb(14, 116, 129, 0.5); height: 50%; text-align: center; padding-top: 30px; padding-bottom: 30px; font-size: 20px; font-weight: bold;">
+    {{restaurants.name}}<br>
+    대표 메뉴: {{restaurants.signature_menu}}
+    <div>
+        <b>분위기:</b> <i class="fas fa-tag"></i>
+        {% load taggit_templatetags2_tags %}
+        {% get_tags_for_object restaurants as "tags" %}
+        {% for tag in tags.all %}
+        <a href="{% url 'tagged_object_list' tag.name %}">{{ tag.name }}</a>
+        {% endfor %}
+        &emsp;
+    </div>
+    </div><br>
+   <div id="map" style="width:600px;height:350px; margin-right: auto; margin-left: auto;"></div>
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9394b1685a74709649493023fbe8fe7d"></script>
+<div id="lat" style="display: none">{{restaurants.latitude}}</div>
+<div id="lng" style="display: none">{{restaurants.longitude}}</div>
+<div id="name" style="display: none">{{restaurants.name}}</div>
+<script>
+var list_lat=document.getElementById("lat").innerText;
+var list_lng=document.getElementById("lng").innerText;
+var list_name=document.getElementById("name").innerText;
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+    mapOption = { 
+        center: new kakao.maps.LatLng(list_lat, list_lng), // 지도의 중심좌표
+        level: 3 // 지도의 확대 레벨
+    };
+
+var map = new kakao.maps.Map(mapContainer, mapOption); // 지도를 생성합니다
+
+// 마커가 표시될 위치입니다 
+var markerPosition  = new kakao.maps.LatLng(list_lat, list_lng); 
+
+// 마커를 생성합니다
+var marker = new kakao.maps.Marker({
+    position: markerPosition
+});
+
+// 마커가 지도 위에 표시되도록 설정합니다
+marker.setMap(map);
+  
+</script>
+
+<div style="text-align: center; line-height: 170%;">
+<br>
+<a href="{% url 'add_comment_to_post' restaurants.id %}" style="font-size: 24px;">리뷰 달기</a>
+<div>
+{%for comment in restaurants.comment_set.all%}
+    {{comment.created_at}}<br>
+    작성자: {{comment.author_name}} /
+    점수: {{comment.point}}
+    {{comment.comment_text|linebreaks}}
+    {% if comment.photo %}
+    <img src="{{ comment.photo.url }}" width="100">
+    {% endif %}<br>
+    <a href="{% url 'update_review' comment.id %}">edit</a>
+    <a href="{% url 'del_comment' comment.id %}">delete</a>
+    <br>
+{%empty%}
+<p>No comments yet</p>
+{%endfor%}
+</div>
+</div>
+</body>
+</html>
